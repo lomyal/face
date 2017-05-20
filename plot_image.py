@@ -3,13 +3,13 @@
 
 ################################################################################
 #
-# Copyright (c) 2017 Baidu.com, Inc. All Rights Reserved
+# Copyright (c) 2017. All Rights Reserved
 #
 ################################################################################
 """
 读取 96x96 图像数据，并绘图
 
-Authors: Wang Shijun (wangshijun03@baidu.com)
+Authors: Wang Shijun
 Create:  2017/04/22 23:58:00
 Modify:  2017/04/22 23:58:00
 """
@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def read_file_to_gray_iamges(file_name='training.csv'):
+def read_file_to_gray_iamges(file_name='data/training.csv'):
     """
     读取数据文件
     :param file_name:
@@ -32,12 +32,12 @@ def read_file_to_gray_iamges(file_name='training.csv'):
                 continue
             image_raw_data = line.split(',')[-1].split(' ')
             image = np.matrix([float(x) for x in image_raw_data]).reshape(96, 96)
-            file_name = 'images/' + str(i) + '.png'
+            file_name = 'data/images/' + str(i) + '.png'
             plt.imsave(arr=image, cmap=plt.gray(), fname=file_name)
             i += 1
 
 
-def read_file_to_rgb_images(file_name='training.csv'):
+def read_file_to_rgb_images(file_name='data/training.csv'):
     """
     读取数据文件
     :param file_name:
@@ -55,12 +55,12 @@ def read_file_to_rgb_images(file_name='training.csv'):
                 for j in range(3):
                     image_data[i * 3 + j] = 256.0 - float(image_raw_data[i])
             image = np.array(image_data).reshape(96, 96, 3)
-            file_name = 'images/' + str(image_id) + '.png'
+            file_name = 'data/images/' + str(image_id) + '.png'
             plt.imsave(arr=image, fname=file_name)
             image_id += 1
 
 
-def read_file_to_rgb_images_labeled(file_name='training.csv'):
+def read_file_to_rgb_images_labeled(file_name='data/training.csv'):
     """
     读取数据文件
     :param file_name:
@@ -98,7 +98,7 @@ def read_file_to_rgb_images_labeled(file_name='training.csv'):
                         # image_data[i * 3 + 1] = 0
                         # image_data[i * 3 + 2] = 0
             image = image_data.reshape(96, 96, 3)
-            file_name = 'images_labeled/' + str(image_id) + '.png'
+            file_name = 'data/images_labeled/' + str(image_id) + '.png'
             plt.imsave(arr=image, fname=file_name)
             image_id += 1
 
