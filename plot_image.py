@@ -14,11 +14,13 @@ Create:  2017/04/22 23:58:00
 Modify:  2017/04/22 23:58:00
 """
 
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def read_file_to_gray_iamges(file_name='data/training.csv'):
+def read_file_to_gray_images(file_name='data/training.csv'):
     """
     读取数据文件
     :param file_name:
@@ -32,6 +34,7 @@ def read_file_to_gray_iamges(file_name='data/training.csv'):
                 continue
             image_raw_data = line.split(',')[-1].split(' ')
             image = np.matrix([float(x) for x in image_raw_data]).reshape(96, 96)
+            os.system('mkdir -p data/images')
             file_name = 'data/images/' + str(i) + '.png'
             plt.imsave(arr=image, cmap=plt.gray(), fname=file_name)
             i += 1
@@ -55,6 +58,7 @@ def read_file_to_rgb_images(file_name='data/training.csv'):
                 for j in range(3):
                     image_data[i * 3 + j] = 256.0 - float(image_raw_data[i])
             image = np.array(image_data).reshape(96, 96, 3)
+            os.system('mkdir -p data/images')
             file_name = 'data/images/' + str(image_id) + '.png'
             plt.imsave(arr=image, fname=file_name)
             image_id += 1
@@ -98,10 +102,12 @@ def read_file_to_rgb_images_labeled(file_name='data/training.csv'):
                         # image_data[i * 3 + 1] = 0
                         # image_data[i * 3 + 2] = 0
             image = image_data.reshape(96, 96, 3)
+            os.system('mkdir -p data/images_labeled')
             file_name = 'data/images_labeled/' + str(image_id) + '.png'
             plt.imsave(arr=image, fname=file_name)
             image_id += 1
 
 
 if __name__ == '__main__':
-    read_file_to_rgb_images_labeled()
+    read_file_to_gray_images()
+    #read_file_to_rgb_images_labeled()
