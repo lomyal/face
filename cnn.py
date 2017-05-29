@@ -43,36 +43,21 @@ def max_pool_2x2(x):
 
 # 灰度图像，大小 96x96
 x = tf.placeholder(tf.float32, shape=[None, 96, 96, 1])
-# y_ = tf.placeholder(tf.float32, shape=[None, 10])
 
 # 双眼中心和鼻尖的二维坐标
-y_ = tf.placeholder(tf.float32, shape=[None, 6])
+y_ = tf.placeholder(tf.float32, shape=[None, 4])
 
 # == First Convolutional Layer == #
 
-# The convolution will compute 32 features for each 5x5 patch.
-# The first two dimensions are the patch size, the next is the number
-# of input channels, and the last is the number of output channels.
 W_conv1 = weight_variable([5, 5, 1, 32])
 b_conv1 = bias_variable([32])
-
-# To apply the layer, we first reshape x to a 4d tensor, with the
-# second and third dimensions corresponding to image width and height,
-# and the final dimension corresponding to the number of color channels.
-
-# x_image = tf.reshape(x, [-1, 320, 320, 3])
 x_image = x
 
-# We then convolve x_image with the weight tensor, add the bias, apply
-# the ReLU function, and finally max pool. The max_pool_2x2 method will
-# reduce the image size to 14x14.
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 h_pool1 = max_pool_2x2(h_conv1)
 
 # == Second Convolutional Layer == #
 
-# In order to build a deep network, we stack several layers of this type.
-# The second layer will have 64 features for each 5x5 patch.
 W_conv2 = weight_variable([5, 5, 32, 64])
 b_conv2 = bias_variable([64])
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
@@ -80,30 +65,18 @@ h_pool2 = max_pool_2x2(h_conv2)
 
 # == Densely Connected Layer == #
 
-# Now that the image size has been reduced to 7x7, we add a
-# fully-connected layer with 1024 neurons to allow processing on the
-# entire image. We reshape the tensor from the pooling layer into a batch
-# of vectors, multiply by a weight matrix, add a bias, and apply a ReLU.
 W_fc1 = weight_variable([24 * 24 * 64, 1024])
 b_fc1 = bias_variable([1024])
 h_pool2_flat = tf.reshape(h_pool2, [-1, 24 * 24 * 64])
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
-# To reduce overfitting, we will apply DROPOUT before the readout layer.
-# We create a placeholder for the probability that a neuron's output is
-# kept during dropout. This allows us to turn dropout on during training,
-# and turn it off during testing. TensorFlow's tf.nn.dropout op
-# automatically handles scaling neuron outputs in addition to masking
-# them, so dropout just works without any additional scaling.
 keep_prob = tf.placeholder(tf.float32)
 h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
 # == Readout Layer == #
 
-# Finally, we add a layer, just like for the one layer softmax regression
-# above.
-W_fc2 = weight_variable([1024, 1])
-b_fc2 = bias_variable([1, 6])
+W_fc2 = weight_variable([1024, 4])
+b_fc2 = bias_variable([4])
 y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
 mse_loss = tf.losses.mean_squared_error(
@@ -118,7 +91,7 @@ sess = tf.InteractiveSession()
 print('ssesion created')
 sess.run(tf.global_variables_initializer())
 print('variables initialized')
-for i in range(100000):
+for i in range(5000000):
     batch = face_train.next_batch(50)
     if i % 100 == 0:
         train_loss = mse_loss.eval(feed_dict={

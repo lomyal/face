@@ -93,9 +93,9 @@ class IO(object):
                     float(attribute[1]),  # left_eye_center_y
                     float(attribute[2]),  # right_eye_center_x
                     float(attribute[3]),  # right_eye_center_y
-                    float(attribute[20]),  # nose_tip_x
-                    float(attribute[21]),  # nose_tip_y
-                ]).reshape(1, 6)
+                #    float(attribute[20]),  # nose_tip_x
+                #    float(attribute[21]),  # nose_tip_y
+                ]).reshape(1, 4)
                 image_raw_data = line_data_list[-1].split(' ')
                 image_float = [float(x) for x in image_raw_data]
                 image = np.array(image_float).reshape(96, 96, 1)
@@ -110,7 +110,7 @@ class IO(object):
         :return:
         """
         images = np.ndarray(shape=(batch_size, 96, 96, 1,))
-        labels = np.ndarray(shape=(batch_size, 6,))
+        labels = np.ndarray(shape=(batch_size, 4,))
         data_count = 0
         while data_count < batch_size:
             images[data_count] = self.training_images[self.training_attribute_count]
