@@ -5,3 +5,5 @@
 training.csv
 images/
 images_labeled/
+summary/
+model/

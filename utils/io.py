@@ -15,7 +15,6 @@ Date:  2017/03/01 22:39:00
 
 import math
 
-import h5py
 import numpy as np
 
 
@@ -63,8 +62,13 @@ class IO(object):
         self.training_file_name = './data/training.csv'
         self.training_images = []
         self.training_attribute = []
+        self.test_images = []
+        self.test_attribute = []
         self._read_data()
         self.data_size = len(self.training_attribute)
+        
+        print('Training data: %d' % len(self.training_images))
+        print('Test data: %d' % len(self.test_images))
 
         # self._pre_process_data()
 
@@ -80,13 +84,15 @@ class IO(object):
                     continue
                 line_data_list = line.split(',')
                 attribute = line_data_list[:-1]
-                position_list = [0, 1, 2, 3, 20, 21, 22, 23, 24, 25]  # 双眼中心和鼻尖的坐标在数据文件中的位置
+                # position_list = [0, 1, 2, 3, 20, 21, 22, 23, 24, 25]  # 双眼中心和鼻尖的坐标在数据文件中的位置
+                position_list = [0, 1, 2, 3, 20, 21]  # 双眼中心和鼻尖的坐标在数据文件中的位置
                 is_dirty = False
                 for pos in position_list:
                     if (self._is_dirty_data(attribute[pos])):
                         is_dirty = True
                         break
                 if is_dirty:
+                    i += 1
                     continue
                 three_point_attribute = np.array([
                     float(attribute[0]),  # left_eye_center_x
@@ -95,17 +101,36 @@ class IO(object):
                     float(attribute[3]),  # right_eye_center_y
                     float(attribute[20]),  # nose_tip_x
                     float(attribute[21]),  # nose_tip_y
-                    float(attribute[22]),  # mouth_left_corner_x
-                    float(attribute[23]),  # mouth_left_corner_y
-                    float(attribute[24]),  # mouth_right_corner_x
-                    float(attribute[25]),  # mouth_right_corner_y
-                ]).reshape(1, 10)
+                    # float(attribute[22]),  # mouth_left_corner_x
+                    # float(attribute[23]),  # mouth_left_corner_y
+                    # float(attribute[24]),  # mouth_right_corner_x
+                    # float(attribute[25]),  # mouth_right_corner_y
+                ]).reshape(1, 6)
                 image_raw_data = line_data_list[-1].split(' ')
                 image_float = [float(x) for x in image_raw_data]
                 image = np.array(image_float).reshape(96, 96, 1)
-                self.training_images.append(image)
-                self.training_attribute.append(three_point_attribute)
+                if i <= 5000:
+                    self.training_images.append(image)
+                    self.training_attribute.append(three_point_attribute)
+                else:
+                    self.test_images.append(image)
+                    self.test_attribute.append(three_point_attribute)
                 i += 1
+            print('i = %d' % i)
+
+    def get_test_data(self):
+        """
+        获取测试集数据
+        """
+        batch_size = len(self.test_images)
+        images = np.ndarray(shape=(batch_size, 96, 96, 1,))
+        labels = np.ndarray(shape=(batch_size, 6,))
+        data_count = 0
+        while data_count < batch_size:
+            images[data_count] = self.training_images[self.training_attribute_count]
+            labels[data_count] = self.training_attribute[self.training_attribute_count]
+            data_count += 1
+        return [images, labels]
 
     def next_batch(self, batch_size):
         """
@@ -114,7 +139,7 @@ class IO(object):
         :return:
         """
         images = np.ndarray(shape=(batch_size, 96, 96, 1,))
-        labels = np.ndarray(shape=(batch_size, 10,))
+        labels = np.ndarray(shape=(batch_size, 6,))
         data_count = 0
         while data_count < batch_size:
             images[data_count] = self.training_images[self.training_attribute_count]
@@ -129,7 +154,7 @@ class IO(object):
         :return:
         """
         if self.training_attribute_count + 1 >= self.data_size:
-            print('=-> Data used up. Start over again.')
+            # print('=-> Data used up. Start over again.')
             # print('=-> Total data: %d' % self.training_attribute_count)
             # print('=-> Dirty data: %d (%.2f%%)' % (
             #    self.dirty_data_count,
