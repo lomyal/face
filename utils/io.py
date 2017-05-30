@@ -80,7 +80,7 @@ class IO(object):
                     continue
                 line_data_list = line.split(',')
                 attribute = line_data_list[:-1]
-                position_list = [0, 1, 2, 3, 20, 21]  # 双眼中心和鼻尖的坐标在数据文件中的位置
+                position_list = [0, 1, 2, 3, 20, 21, 22, 23, 24, 25]  # 双眼中心和鼻尖的坐标在数据文件中的位置
                 is_dirty = False
                 for pos in position_list:
                     if (self._is_dirty_data(attribute[pos])):
@@ -93,9 +93,13 @@ class IO(object):
                     float(attribute[1]),  # left_eye_center_y
                     float(attribute[2]),  # right_eye_center_x
                     float(attribute[3]),  # right_eye_center_y
-                #    float(attribute[20]),  # nose_tip_x
-                #    float(attribute[21]),  # nose_tip_y
-                ]).reshape(1, 4)
+                    float(attribute[20]),  # nose_tip_x
+                    float(attribute[21]),  # nose_tip_y
+                    float(attribute[22]),  # mouth_left_corner_x
+                    float(attribute[23]),  # mouth_left_corner_y
+                    float(attribute[24]),  # mouth_right_corner_x
+                    float(attribute[25]),  # mouth_right_corner_y
+                ]).reshape(1, 10)
                 image_raw_data = line_data_list[-1].split(' ')
                 image_float = [float(x) for x in image_raw_data]
                 image = np.array(image_float).reshape(96, 96, 1)
@@ -110,7 +114,7 @@ class IO(object):
         :return:
         """
         images = np.ndarray(shape=(batch_size, 96, 96, 1,))
-        labels = np.ndarray(shape=(batch_size, 4,))
+        labels = np.ndarray(shape=(batch_size, 10,))
         data_count = 0
         while data_count < batch_size:
             images[data_count] = self.training_images[self.training_attribute_count]
@@ -126,10 +130,10 @@ class IO(object):
         """
         if self.training_attribute_count + 1 >= self.data_size:
             print('=-> Data used up. Start over again.')
-            print('=-> Total data: %d' % self.training_attribute_count)
-            print('=-> Dirty data: %d (%.2f%%)' % (
-                self.dirty_data_count,
-                self.dirty_data_count / self.training_attribute_count * 100))
+            # print('=-> Total data: %d' % self.training_attribute_count)
+            # print('=-> Dirty data: %d (%.2f%%)' % (
+            #    self.dirty_data_count,
+            #    self.dirty_data_count / self.training_attribute_count * 100))
             # print('=-> Dirty data (velocity): %d' % self.dirty_data_velo_count)
             # print('=-> Dirty data (curvature): %d' % self.dirty_data_curv_count)
             self.training_attribute_count = 0
