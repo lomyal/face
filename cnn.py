@@ -21,7 +21,7 @@ import utils.io
 
 
 #timestamp = str(int(time.time()))
-timestamp = datetime.datetime.now().strftime('%Y%m%d%_H%M%S')
+timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 
 face_train = utils.io.IO()
 test_data = face_train.get_test_data()
@@ -118,7 +118,7 @@ sess.run(tf.global_variables_initializer())
 
 save_path = ''
 
-for i in range(5000000):
+for i in range(10000000):
     batch = face_train.next_batch(200)
 
     if i % 100 == 0:
@@ -141,10 +141,19 @@ for i in range(5000000):
         #     keep_prob: 1.0})
         # test_writer.add_summary(summary, i)
         
-        if test_loss < 1.5 and train_loss < 1.5:
-        # if test_loss < 10000 and train_loss < 10000:
-            os.system('mkdir -p model')
-            save_path = saver.save(sess, 'model/model_' + timestamp + '.ckpt')
+        os.system('mkdir -p model')
+
+        if test_loss < 1.0 and train_loss < 1.0:
+            save_path = saver.save(sess, 'model/model_' + timestamp + '_loss1d0' + '.ckpt')
+
+        if test_loss < 0.5 and train_loss < 0.5:
+            save_path = saver.save(sess, 'model/model_' + timestamp + '_loss0d5' + '.ckpt')
+
+        if test_loss < 0.3 and train_loss < 0.3:
+            save_path = saver.save(sess, 'model/model_' + timestamp + '_loss0d3' + '.ckpt')
+
+        if test_loss < 0.2 and train_loss < 0.2:
+            save_path = saver.save(sess, 'model/model_' + timestamp + '_loss0d2' + '.ckpt')
             print('model saved at ' + save_path)
             break
         
@@ -164,5 +173,5 @@ with tf.Session() as sess:
         y_: test_data[1],
         keep_prob: 1.0})
     date = datetime.datetime.now()
-    print("[%s] step %d, test loss %g" % (date, i, test_loss))
+    print("[%s] test loss %g" % (date, test_loss))
 
