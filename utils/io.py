@@ -118,19 +118,31 @@ class IO(object):
                 i += 1
             print('i = %d' % i)
 
+    def _get_test_data(self, batch_size, start_num=0):
+        """
+        获取测试集数据（以一定的 batch_size）
+        """
+        images = np.ndarray(shape=(batch_size, 96, 96, 1,))
+        labels = np.ndarray(shape=(batch_size, 6,))
+        data_count = 0
+        while data_count < batch_size:
+            images[data_count] = self.training_images[self.training_attribute_count + start_num]
+            labels[data_count] = self.training_attribute[self.training_attribute_count + start_num]
+            data_count += 1
+        return [images, labels]
+
     def get_test_data(self):
         """
         获取测试集数据
         """
         batch_size = len(self.test_images)
-        images = np.ndarray(shape=(batch_size, 96, 96, 1,))
-        labels = np.ndarray(shape=(batch_size, 6,))
-        data_count = 0
-        while data_count < batch_size:
-            images[data_count] = self.training_images[self.training_attribute_count]
-            labels[data_count] = self.training_attribute[self.training_attribute_count]
-            data_count += 1
-        return [images, labels]
+        return self._get_test_data(batch_size)
+
+    def get_one_test_sample(self, sn):
+        """
+        获取单个测试集样本
+        """
+        return self._get_test_data(1, sn)
 
     def next_batch(self, batch_size):
         """

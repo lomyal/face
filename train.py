@@ -86,7 +86,7 @@ for i in range(10000000):
             save_path = saver.save(sess, 'model/model_' + timestamp + '_loss0d2' + '.ckpt')
             print('model saved at ' + save_path)
             break
-        
+
     summary, _ = sess.run([merged, optimizer], feed_dict={
         x: batch[0],
         y_: batch[1],
